@@ -20,18 +20,22 @@ tab_gender, tab_age, tab_academic, tab_relationship, tab_platform, tab_country =
 with tab_gender:
     df_gender = df.groupby('Gender').size().reset_index(name='GenderCount')
     st.bar_chart(df_gender, x='Gender', y='GenderCount', color=['#0061A4'])
+    st.caption('Figure 1.1. Gender distribution. Distribution of male and female is balanced.')
 
 with tab_age:
     df_age = df.groupby('Age').size().reset_index(name='AgeCount')
     st.bar_chart(df_age, x='Age', y='AgeCount', color=['#291871'])
+    st.caption('Figure 1.2. Age distribution. Ages between 19-22yo have the higher number of data while the other considerably lower.')
 
 with tab_academic:
     df_academic = df.groupby('Academic_Level').size().reset_index(name='AcademicCount')
     st.bar_chart(df_academic, x='Academic_Level', y='AcademicCount', color=['#D82435'])
+    st.caption('Figure 1.3. Academic level distribution. Most respondent are undergraduate or graduate student. Only few samples from highschool student.')
 
 with tab_relationship:
     df_relationship = df.groupby('Relationship_Status').size().reset_index(name='RelationshipCount')
     st.bar_chart(df_relationship, x='Relationship_Status', y='RelationshipCount', color=['#F26920'])
+    st.caption('Figure 1.4. Relationshop distribution. Most respondent are either in relationship or single. Respondents with complicated relationship only in small number.')
 
 with tab_platform:
     top4platform = df["Most_Used_Platform"].value_counts().nlargest(4).index
@@ -40,6 +44,7 @@ with tab_platform:
     )
     df_platform = df.groupby('Top_Most_Used_Platform').size().reset_index(name='PlatformCount')
     st.bar_chart(df_platform, x='Top_Most_Used_Platform', y='PlatformCount', color=['#FAE609'])
+    st.caption('Figure 1.5. Platform distribution. There are actually 12 platforms mostly used by the responder. To create better visualization, only top 4 are shown. The other platforms are combined as Other.')
 
 with tab_country:
     top9country = df["Country"].value_counts().nlargest(9).index
@@ -48,6 +53,7 @@ with tab_country:
     )
     df_country = df.groupby('Top_Country').size().reset_index(name='CountryCount')
     st.bar_chart(df_country, x='Top_Country', y='CountryCount', color=['#00924C'])
+    st.caption('Figure 1.6. Country distribution. The participants come from 110 countries. For better clarity, only 9 countries with top participants are shown. The other countries are grouped as Other.')
 
 st.subheader("Target Distribution")
 st.text("The selected target from the dataset is Addicted Score. The distribution and feature correlation are as follow.")
