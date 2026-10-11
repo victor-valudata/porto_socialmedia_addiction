@@ -56,7 +56,8 @@ with tab_country:
 st.text("Demography wise, nothing special about the contributors. In general, age and academic level are as expected from the target contributors. The relationship status of the contributors are also common. Perhaps the only interesting take from the demography is the large number of origin country of the contributors at 110. However, the distribution is cosiderably balanced. While the correlation of the origin country to the target can be seen in the Feature Correlation section.")
 
 st.subheader("Social Media Behavior")
-tab_platform, tab_daily_hour = st.tabs(["Platform", "Daily Usage"])
+tab_platform, tab_daily_hour, tab_academic_performance, tab_sleep, tab_conflict = st.tabs(
+    ["Platform", "Daily Usage", "Academic Performance", "Sleep (Hrs)/Night", "Social Media Conflict"])
 
 with tab_platform:
     top4platform = df["Most_Used_Platform"].value_counts().nlargest(4).index
@@ -69,7 +70,7 @@ with tab_platform:
         key=lambda x: x.eq("Others")
         ).reset_index(drop=True)
     st.bar_chart(df_platform, x='Top_Most_Used_Platform', y='PlatformCount', color=['#FAE609'], sort=False)
-    st.caption('Figure 1.5. Platform distribution. There are actually 12 platforms mostly used by the contributors. To create better visualization, only top 4 are shown. The other platforms are combined as Other.')
+    st.caption('Figure 1.6. Platform distribution. There are actually 12 platforms mostly used by the contributors. To create better visualization, only top 4 are shown. The other platforms are combined as Other.')
 
 with tab_daily_hour:
     bins = [1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, np.inf]
@@ -92,9 +93,47 @@ with tab_daily_hour:
     )
     df_dailyhour = df.groupby('Daily_Hours').size().reset_index(name='DailyHoursCount')
     st.bar_chart(df_dailyhour, x='Daily_Hours', y='DailyHoursCount', color=['#FAE609'], sort=False)
-    st.caption('Figure 1.5. Platform distribution. There are actually 12 platforms mostly used by the contributors. To create better visualization, only top 4 are shown. The other platforms are combined as Other.')
+    st.caption('Figure 1.7. Average Daily Usage (Hours) distribution. The numbers are ranging from 1.5 to 8.5 hours with single decimal precision. To give better visualization, here the numbers are grouped in 7 groups with 1 step.')
     # st.write(df_dailyhour)
 
+with tab_academic_performance:
+    df_academic_performance = df.groupby('Affects_Academic_Performance').size().reset_index(name='AcademicPerformanceCount')
+    st.bar_chart(df_academic_performance, x='Affects_Academic_Performance', y='AcademicPerformanceCount', color=['#F26920'])
+    st.caption('Figure 1.8. Academic Performance distribution. Yes means that social media affected academic performance while No means otherwise.')
+
+with tab_sleep:
+    bins = [3, 4, 5, 6, 7, 8, 9, np.inf]
+
+    labels = [
+        "3-4",
+        "4-5",
+        "5-6",
+        "6-7",
+        "7-8",
+        "8-9",
+        "9-.."
+    ]
+
+    df["Sleep_Hours"] = pd.cut(
+        df["Sleep_Hours_Per_Night"],
+        bins=bins,
+        labels=labels,
+        right=False
+    )
+    df_sleephour = df.groupby('Sleep_Hours').size().reset_index(name='SleepHoursCount')
+    st.bar_chart(df_sleephour, x='Sleep_Hours', y='SleepHoursCount', color=['#FAE609'], sort=False)
+    st.caption('Figure 1.9. Sleep Hours per Night distribution. The numbers are ranging from 3.8 to 9.6 hours with single decimal precision. To give better visualization, here the numbers are grouped in 7 groups with 1 step.')
+
+with tab_conflict:
+    df_conflict = df.groupby('Conflicts_Over_Social_Media').size().reset_index(name='ConflictCount')
+    st.bar_chart(df_conflict, x='Conflicts_Over_Social_Media', y='ConflictCount', color=['#F26920'])
+    st.caption('Figure 1.10. Conflicts over social media distribution. Value 0 means no conflicts over social media while 5 means very high conflicts over social media.')
+
+pct_platform = df['Most_Used_Platform'].where(df['Most_Used_Platform'] == 'Instagram').count() * 100 / df['Most_Used_Platform'].count()
+pct_academic = df['Affects_Academic_Performance'].where(df['Affects_Academic_Performance'] == 'Yes').count() * 100 / df['Affects_Academic_Performance'].count()
+st.write("Social media behavior of the contributors shows a more interesting insight. Most used platform is Instagram at around ", round(pct_platform,1), "%. Most contributors use social media at 4.5-5.5 hours daily while in average the contributors use social media at ", round(df["Avg_Daily_Usage_Hours"].mean(),1), "hours. As student, ", round(pct_academic,1) ," %", " contributors also admit that their social media usage impact their academic performance.")
+st.write("Interestingly, despite the higher time on social media, most contributors may sleep around 7-8 hours daily with", round(df['Sleep_Hours_Per_Night'].mean(),1) ," hours daily for all contributor. Most contributors also admit to have conflict over social media at score of 3 with the average of ", round(df['Conflicts_Over_Social_Media'].mean(),1), "." )
+st.write("Based on daily usage, affect on academic performance and social media conflicts, it is pretty clear that the contributors use social media at generous time in their daily life. However, the contributors may maintain their sleep at healthy hour. The combination of social media hour and sleep hour may explains the affect on academic performance. Since the contributors maintain their sleep, the most logical deduction is that the social media hour reduce their time to study.")
 
 st.subheader("Target Distribution")
 st.text("The selected target from the dataset is Addicted Score. The distribution and feature correlation are as follow.")
@@ -120,7 +159,7 @@ if df_rel['Addicted_Score'].dtype == 'object':
     target_le = LabelEncoder()
     df_rel['Addicted_Score'] = target_le.fit_transform(df_rel['Addicted_Score'].astype(str))
 
-features_for_corr = df_rel.drop(columns=['Student_ID', 'Mental_Health_Score', 'Daily_Hours', 'Top_Most_Used_Platform', "Top_Country"], errors='ignore')
+features_for_corr = df_rel.drop(columns=['Student_ID', 'Mental_Health_Score', 'Daily_Hours', 'Top_Most_Used_Platform', "Top_Country", "Sleep_Hours"], errors='ignore')
 correlation_matrix = features_for_corr.corr()
 
 # Extract correlations with the target variable, sorted
