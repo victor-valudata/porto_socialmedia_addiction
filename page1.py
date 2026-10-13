@@ -26,22 +26,22 @@ tab_gender, tab_age, tab_academic, tab_relationship, tab_country = st.tabs(
 
 with tab_gender:
     df_gender = df.groupby('Gender').size().reset_index(name='GenderCount')
-    st.bar_chart(df_gender, x='Gender', y='GenderCount', color=['#0061A4'])
+    st.bar_chart(df_gender, x='Gender', y='GenderCount', color=['#356e90'])
     st.caption('Figure 1.1. Gender distribution. Distribution of male and female is balanced.')
 
 with tab_age:
     df_age = df.groupby('Age').size().reset_index(name='AgeCount')
-    st.bar_chart(df_age, x='Age', y='AgeCount', color=['#291871'])
+    st.bar_chart(df_age, x='Age', y='AgeCount', color=['#356e90'])
     st.caption('Figure 1.2. Age distribution. Contributors age are within 19-24 with the majority ages between 19-22yo.')
 
 with tab_academic:
     df_academic = df.groupby('Academic_Level').size().reset_index(name='AcademicCount')
-    st.bar_chart(df_academic, x='Academic_Level', y='AcademicCount', color=['#D82435'])
+    st.bar_chart(df_academic, x='Academic_Level', y='AcademicCount', color=['#356e90'])
     st.caption('Figure 1.3. Academic level distribution. Most contributors are undergraduate or graduate student. Only few contributors come from highschool student.')
 
 with tab_relationship:
     df_relationship = df.groupby('Relationship_Status').size().reset_index(name='RelationshipCount')
-    st.bar_chart(df_relationship, x='Relationship_Status', y='RelationshipCount', color=['#F26920'])
+    st.bar_chart(df_relationship, x='Relationship_Status', y='RelationshipCount', color=['#356e90'])
     st.caption('Figure 1.4. Relationshop distribution. Most contributors are either in relationship or single. Contributors with complicated relationship only in small number.')
 
 with tab_country:
@@ -50,7 +50,7 @@ with tab_country:
         df["Country"].isin(top9country), "Others"
     )
     df_country = df.groupby('Top_Country').size().reset_index(name='CountryCount')
-    st.bar_chart(df_country, x='Top_Country', y='CountryCount', color=['#00924C'])
+    st.bar_chart(df_country, x='Top_Country', y='CountryCount', color=['#356e90'])
     st.caption('Figure 1.6. Country distribution. The contributors come from 110 countries. For better clarity, only 9 countries with top contributors are shown. The other countries are grouped as Other.')
 
 st.text("Demography wise, nothing special about the contributors. In general, age and academic level are as expected from the target contributors. The relationship status of the contributors are also common. Perhaps the only interesting take from the demography is the large number of origin country of the contributors at 110. However, the distribution is cosiderably balanced. While the correlation of the origin country to the target can be seen in the Feature Correlation section.")
@@ -69,7 +69,7 @@ with tab_platform:
         by="Top_Most_Used_Platform",
         key=lambda x: x.eq("Others")
         ).reset_index(drop=True)
-    st.bar_chart(df_platform, x='Top_Most_Used_Platform', y='PlatformCount', color=['#FAE609'], sort=False)
+    st.bar_chart(df_platform, x='Top_Most_Used_Platform', y='PlatformCount', color=['#e28502'], sort=False)
     st.caption('Figure 1.6. Platform distribution. There are actually 12 platforms mostly used by the contributors. To create better visualization, only top 4 are shown. The other platforms are combined as Other.')
 
 with tab_daily_hour:
@@ -92,13 +92,13 @@ with tab_daily_hour:
         right=False
     )
     df_dailyhour = df.groupby('Daily_Hours').size().reset_index(name='DailyHoursCount')
-    st.bar_chart(df_dailyhour, x='Daily_Hours', y='DailyHoursCount', color=['#FAE609'], sort=False)
+    st.bar_chart(df_dailyhour, x='Daily_Hours', y='DailyHoursCount', color=['#e28502'], sort=False)
     st.caption('Figure 1.7. Average Daily Usage (Hours) distribution. The numbers are ranging from 1.5 to 8.5 hours with single decimal precision. To give better visualization, here the numbers are grouped in 7 groups with 1 step.')
     # st.write(df_dailyhour)
 
 with tab_academic_performance:
     df_academic_performance = df.groupby('Affects_Academic_Performance').size().reset_index(name='AcademicPerformanceCount')
-    st.bar_chart(df_academic_performance, x='Affects_Academic_Performance', y='AcademicPerformanceCount', color=['#F26920'])
+    st.bar_chart(df_academic_performance, x='Affects_Academic_Performance', y='AcademicPerformanceCount', color=['#e28502'])
     st.caption('Figure 1.8. Academic Performance distribution. Yes means that social media affected academic performance while No means otherwise.')
 
 with tab_sleep:
@@ -121,12 +121,12 @@ with tab_sleep:
         right=False
     )
     df_sleephour = df.groupby('Sleep_Hours').size().reset_index(name='SleepHoursCount')
-    st.bar_chart(df_sleephour, x='Sleep_Hours', y='SleepHoursCount', color=['#FAE609'], sort=False)
+    st.bar_chart(df_sleephour, x='Sleep_Hours', y='SleepHoursCount', color=['#e28502'], sort=False)
     st.caption('Figure 1.9. Sleep Hours per Night distribution. The numbers are ranging from 3.8 to 9.6 hours with single decimal precision. To give better visualization, here the numbers are grouped in 7 groups with 1 step.')
 
 with tab_conflict:
     df_conflict = df.groupby('Conflicts_Over_Social_Media').size().reset_index(name='ConflictCount')
-    st.bar_chart(df_conflict, x='Conflicts_Over_Social_Media', y='ConflictCount', color=['#F26920'])
+    st.bar_chart(df_conflict, x='Conflicts_Over_Social_Media', y='ConflictCount', color=['#e28502'])
     st.caption('Figure 1.10. Conflicts over social media distribution. Value 0 means no conflicts over social media while 5 means very high conflicts over social media.')
 
 pct_platform = df['Most_Used_Platform'].where(df['Most_Used_Platform'] == 'Instagram').count() * 100 / df['Most_Used_Platform'].count()
@@ -138,7 +138,7 @@ st.write("Based on daily usage, affect on academic performance and social media 
 st.subheader("Social Media Addiction")
 st.text("The addiction level of the contributors is shown in Addicted Score. The distribution of contributors to the addicted score is shown as follows")
 df_addictedscore = df.groupby('Addicted_Score').size().reset_index(name='AddictedScodeCount')
-st.bar_chart(df_addictedscore, x='Addicted_Score', y='AddictedScodeCount', color=['#291871'])
+st.bar_chart(df_addictedscore, x='Addicted_Score', y='AddictedScodeCount', color=['#3e272d'])
 st.caption("Figure 1.11. Target (Addicted Score) Distribution. Addicted Score is in integer ranges from 2 to 9.")
 st.text("Figure 1.11 show that most of the contributors have addicted score of 7 while even some goes higher at 9 while only 1 contributor has score of 2. Since the higher the score means the higher the addiction level, it shows bad reality. Many of the contributors are highly addicted with the social media. Combined with the previous analysis, the addiction at the level of affecting their performance as student.")
 
@@ -183,7 +183,7 @@ with tab_all_corr:
         'Negatively Relate' : target_corr_negs,
         'Features' : target_corr.index.tolist(),
     })
-    st.bar_chart(df_targetcorr, x='Features', y=['Positively Relate','Negatively Relate'] , y_label='', horizontal=True, sort=False, color=['blue','red'])
+    st.bar_chart(df_targetcorr, x='Features', y=['Positively Relate','Negatively Relate'] , y_label='', horizontal=True, sort=False, color=['#356e90','#e28502'])
     st.caption("Figure 1.12. Correlation between the available variables and addiction are shown. Longer bar shows higher correlation while shorter bar shows lower correlation. Negative value indicates negative correlation.")
 
 with tab_daily_corr:
@@ -191,6 +191,7 @@ with tab_daily_corr:
         df,
         x = "Avg_Daily_Usage_Hours",
         y = "Addicted_Score",
+        color = "#356e90",
     )
     st.caption("Figure 1.13. Average Daily Usage Hours (of social media) to Addiction. Higher usage means higher addiction score.")
 
@@ -199,6 +200,7 @@ with tab_academic_corr:
         df,
         x = "Affects_Academic_Performance",
         y = "Addicted_Score",
+        color = "#356e90",
     )
     st.caption("Figure 1.14. Affects of Academic Performance to Addiction. Only contributors with academic performance affected (YES) have high addiction score.")
 
@@ -207,6 +209,7 @@ with tab_sleep_corr:
         df,
         x = "Sleep_Hours_Per_Night",
         y = "Addicted_Score",
+        color = "#e28502",
     )
     st.caption("Figure 1.15. Sleep Hours per Night to Addiction. Contributors with high addiction score tend to have lower number of sleeping hours.")
 
@@ -215,6 +218,7 @@ with tab_conflict_corr:
         df,
         x = "Conflicts_Over_Social_Media",
         y = "Addicted_Score",
+        color = "#356e90",
     )
     st.caption("Figure 1.16. Conflicts Over Social Media to Addiction. Contributors with higher number of conflicts in social media have high addiction score.")
 
