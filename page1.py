@@ -135,51 +135,91 @@ st.write("Social media behavior of the contributors shows a more interesting ins
 st.write("Interestingly, despite the higher time on social media, most contributors may sleep around 7-8 hours daily with", round(df['Sleep_Hours_Per_Night'].mean(),1) ," hours daily for all contributor. Most contributors also admit to have conflict over social media at score of 3 with the average of ", round(df['Conflicts_Over_Social_Media'].mean(),1), "." )
 st.write("Based on daily usage, affect on academic performance and social media conflicts, it is pretty clear that the contributors use social media at generous time in their daily life. However, the contributors may maintain their sleep at healthy hour. The combination of social media hour and sleep hour may explains the affect on academic performance. Since the contributors maintain their sleep, the most logical deduction is that the social media hour reduce their time to study.")
 
-st.subheader("Target Distribution")
-st.text("The selected target from the dataset is Addicted Score. The distribution and feature correlation are as follow.")
+st.subheader("Social Media Addiction")
+st.text("The addiction level of the contributors is shown in Addicted Score. The distribution of contributors to the addicted score is shown as follows")
 df_addictedscore = df.groupby('Addicted_Score').size().reset_index(name='AddictedScodeCount')
 st.bar_chart(df_addictedscore, x='Addicted_Score', y='AddictedScodeCount', color=['#291871'])
-st.caption("Figure 1.7. Target (Addicted Score) Distribution. Addicted Score is in integer ranges from 2 to 9.")
+st.caption("Figure 1.11. Target (Addicted Score) Distribution. Addicted Score is in integer ranges from 2 to 9.")
+st.text("Figure 1.11 show that most of the contributors have addicted score of 7 while even some goes higher at 9 while only 1 contributor has score of 2. Since the higher the score means the higher the addiction level, it shows bad reality. Many of the contributors are highly addicted with the social media. Combined with the previous analysis, the addiction at the level of affecting their performance as student.")
 
 st.subheader("Feature Correlation")
-df_rel = df.copy()
+tab_all_corr, tab_daily_corr, tab_academic_corr, tab_sleep_corr, tab_conflict_corr = st.tabs(
+    ["General Feature Correlation", "Daily Use", "Affects on Academic Performance", "Sleep Hours per Night", "Social Media Conflict"])
 
-# Encode categorical columns
-label_encoders = {}
-categorical_cols = df_rel.select_dtypes(include=['object']).columns
+with tab_all_corr:
+    df_rel = df.copy()
 
-for col in categorical_cols:
-    if col != 'Addicted_Score': # Ensure target is handled separately if needed
-        le = LabelEncoder()
-        df_rel[col] = le.fit_transform(df_rel[col].astype(str))
-        label_encoders[col] = le
+    # Encode categorical columns
+    label_encoders = {}
+    categorical_cols = df_rel.select_dtypes(include=['object']).columns
 
-# If target variable is text/categorical, encode it
-if df_rel['Addicted_Score'].dtype == 'object':
-    target_le = LabelEncoder()
-    df_rel['Addicted_Score'] = target_le.fit_transform(df_rel['Addicted_Score'].astype(str))
+    for col in categorical_cols:
+        if col != 'Addicted_Score': # Ensure target is handled separately if needed
+            le = LabelEncoder()
+            df_rel[col] = le.fit_transform(df_rel[col].astype(str))
+            label_encoders[col] = le
 
-features_for_corr = df_rel.drop(columns=['Student_ID', 'Mental_Health_Score', 'Daily_Hours', 'Top_Most_Used_Platform', "Top_Country", "Sleep_Hours"], errors='ignore')
-correlation_matrix = features_for_corr.corr()
+    # If target variable is text/categorical, encode it
+    if df_rel['Addicted_Score'].dtype == 'object':
+        target_le = LabelEncoder()
+        df_rel['Addicted_Score'] = target_le.fit_transform(df_rel['Addicted_Score'].astype(str))
 
-# Extract correlations with the target variable, sorted
-target_corr = correlation_matrix['Addicted_Score'].drop('Addicted_Score').sort_values(ascending=False)
-target_corr_pos = []
-target_corr_negs = []
-for corr in target_corr:
-    if corr < 0:
-        target_corr_pos.append(0)
-        target_corr_negs.append(corr)
-    else:
-        target_corr_pos.append(corr)
-        target_corr_negs.append(0)
-df_targetcorr = pd.DataFrame({
-    'Positively Relate' : target_corr_pos,
-    'Negatively Relate' : target_corr_negs,
-    'Features' : target_corr.index.tolist(),
-})
-st.bar_chart(df_targetcorr, x='Features', y=['Positively Relate','Negatively Relate'] , y_label='', horizontal=True, sort=False, color=['blue','red'])
-st.caption("Figure 1.8. Correlation between features and target are shown. Longer bar shows higher correlation while shorter bar shows lower correlation. Negative value indicates negative correlation.")
+    features_for_corr = df_rel.drop(columns=['Student_ID', 'Mental_Health_Score', 'Daily_Hours', 'Top_Most_Used_Platform', "Top_Country", "Sleep_Hours"], errors='ignore')
+    correlation_matrix = features_for_corr.corr()
+
+    # Extract correlations with the target variable, sorted
+    target_corr = correlation_matrix['Addicted_Score'].drop('Addicted_Score').sort_values(ascending=False)
+    target_corr_pos = []
+    target_corr_negs = []
+    for corr in target_corr:
+        if corr < 0:
+            target_corr_pos.append(0)
+            target_corr_negs.append(corr)
+        else:
+            target_corr_pos.append(corr)
+            target_corr_negs.append(0)
+    df_targetcorr = pd.DataFrame({
+        'Positively Relate' : target_corr_pos,
+        'Negatively Relate' : target_corr_negs,
+        'Features' : target_corr.index.tolist(),
+    })
+    st.bar_chart(df_targetcorr, x='Features', y=['Positively Relate','Negatively Relate'] , y_label='', horizontal=True, sort=False, color=['blue','red'])
+    st.caption("Figure 1.12. Correlation between the available variables and addiction are shown. Longer bar shows higher correlation while shorter bar shows lower correlation. Negative value indicates negative correlation.")
+
+with tab_daily_corr:
+    st.scatter_chart(
+        df,
+        x = "Avg_Daily_Usage_Hours",
+        y = "Addicted_Score",
+    )
+    st.caption("Figure 1.13. Average Daily Usage Hours (of social media) to Addiction. Higher usage means higher addiction score.")
+
+with tab_academic_corr:
+    st.scatter_chart(
+        df,
+        x = "Affects_Academic_Performance",
+        y = "Addicted_Score",
+    )
+    st.caption("Figure 1.14. Affects of Academic Performance to Addiction. Only contributors with academic performance affected (YES) have high addiction score.")
+
+with tab_sleep_corr:
+    st.scatter_chart(
+        df,
+        x = "Sleep_Hours_Per_Night",
+        y = "Addicted_Score",
+    )
+    st.caption("Figure 1.15. Sleep Hours per Night to Addiction. Contributors with high addiction score tend to have lower number of sleeping hours.")
+
+with tab_conflict_corr:
+    st.scatter_chart(
+        df,
+        x = "Conflicts_Over_Social_Media",
+        y = "Addicted_Score",
+    )
+    st.caption("Figure 1.16. Conflicts Over Social Media to Addiction. Contributors with higher number of conflicts in social media have high addiction score.")
+
+st.text("Figure 1.12. shows which variables or features that have high correlation to the addiction score. Demographic variables have lower correlation (shorter bar) compared to behavior variables (longer bar). Interestingly, the education level of the contributors has little correlation to the addiction level even compared to age or country of origin. It against common conception that education may help in eradicate social media addiction. Moreover, as shown in Figure 1.3. most of the contributors in the dataset are undergraduate or graduate students. Top 4 variables with significant impact to the addiction are conflicts over social media, affects on academic performance, daily usage and sleeping hours.")
+st.text("Conflict, academic performance and usage have positive correlation to addiction score. It means the higher the number indicates higher addiction as shown in Figure 1.13, 1.14 and 1.16. While sleeping has negative correlation to addiction which means the lower sleeping hour indicates higher addiction score as shown in Figure 1.15.")
 
 
 
