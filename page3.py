@@ -15,22 +15,33 @@ def predict_addiction(user_input_dict):
     # 2. Convert input to a DataFrame
     input_df = pd.DataFrame([user_input_dict])
 
-    # 3. Encode categorical columns using our saved encoders
     if not loaded_encoders:
         raise ValueError("The loaded 'label_encoders.joblib' is empty! Please re-run the pre-processing and saving cells first.")
 
-    for col, encoder in loaded_encoders.items():
-        if col in input_df.columns:
-            try:
-                input_df[col] = encoder.transform(input_df[col].astype(str))
-            except ValueError:
-                # Fallback to unseen categories
-                input_df[col] = 0
+    # 3. Apply target encoding for 'Country'
+    if 'Country' in input_df.columns:
+        country_map = loaded_encoders.get('country_target_map', {})
+        global_mean = loaded_encoders.get('country_global_mean', 6.0)
+        input_df['Country'] = input_df['Country'].map(country_map).fillna(global_mean)
 
-    # 4. Ensure correct column alignment and ordering
+    # 4. Apply Ordinal Encoding
+    ordinal_cols = ['Gender', 'Academic_Level', 'Affects_Academic_Performance', 'Relationship_Status']
+    if 'ordinal_encoder' in loaded_encoders:
+        ord_encoder = loaded_encoders['ordinal_encoder']
+        input_df[ordinal_cols] = ord_encoder.transform(input_df[ordinal_cols].astype(str))
+
+    # 5. Handle One-Hot Encoding for 'Most_Used_Platform'
+    # Get dummy variables for the categorical column
+    input_df = pd.get_dummies(input_df, columns=['Most_Used_Platform'], drop_first=False)
+
+    # 6. Reconstruct missing dummy columns with False and filter correct sequence of features
+    for col in model_features:
+        if col not in input_df.columns:
+            input_df[col] = False
+
     input_df = input_df[model_features]
 
-    # 5. Run prediction
+    # 7. Run prediction
     prediction = loaded_model.predict(input_df)
     return prediction[0]
 

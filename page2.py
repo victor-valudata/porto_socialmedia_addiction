@@ -12,19 +12,23 @@ st.subheader("Missing Values")
 st.text("Finding missing values with the following script")
 st.code("df.isnull().sum()")
 st.text("The script result is 0. No further action is required")
-st.subheader("Non-Numerical Columns")
+st.subheader("Encoding Categorical Columns")
 st.text("Finding categorical columns with the following script")
 st.code("categorical_cols = df.select_dtypes(include=['object']).columns")
-st.text("The script result shows some categorical columns. Those columns are 'Gender', 'Academic_Level', 'Country', 'Most_Used_Platform', 'Affects_Academic_Performance', and 'Relationship_Status'")
-st.text("LabelEncoder are applied to those columns with the following script")
-st.code("label_encoders = {}\n" \
-"for col in categorical_cols:\n" \
-"\tle = LabelEncoder()\n" \
-"\tdf[col] = le.fit_transform(df[col].astype(str))\n" \
-"\tlabel_encoders[col] = le")
+st.text("The script result shows some categorical columns. Those columns are 'Gender', 'Academic_Level', 'Country', 'Most_Used_Platform', 'Affects_Academic_Performance', and 'Relationship_Status'. Different encoding strategies are taken due to different field charateristic.")
+st.text("Column 'Country' contains 110 unique values. It is encoded with Target Encoding using the following script")
+st.code("country_means = df.groupby('Country')['Addicted_Score'].mean().to_dict()\n" \
+"global_mean = df['Addicted_Score'].mean()\n" \
+"df['Country'] = df['Country'].map(country_means).fillna(global_mean)")
+st.text("Column 'Most_Used_Platform' contains 12 unique values and encoded with One-Hot Encoding using the following script")
+st.code("df = pd.get_dummies(df, columns=['Most_Used_Platform'], drop_first=False)")
+st.text("The other categorical columns are encoded with Ordinal Encoding using the following script")
+st.code("ordinal_cols = ['Gender', 'Academic_Level', 'Affects_Academic_Performance', 'Relationship_Status']\n" \
+"ord_encoder = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)\n" \
+"df[ordinal_cols] = ord_encoder.fit_transform(df[ordinal_cols].astype(str))")
 st.subheader("Miscellaneous")
 st.text("Based on Figure 1.7., the Addicted_Score 2 has only 1 member. Since it is heavily imbalanced and makes problem in further train/test split. In order to create better model, the data is removed.")
-st.text("Based on Table 1.1. there are some columns need to be removed. Student_ID column has only unique value so this column is ommited. Mental_Health_Score column is considered as target so this column is ommited.")
+st.text("Based on Table 1.1. there are some columns need to be removed. Student_ID column has only unique value so this column is ommited. Mental_Health_Score column is considered as secondary target so this column is ommited.")
 st.subheader("Training Stage")
 st.subheader("Creating Feature and Target")
 st.text("Creating Feature and Target is done with the following script")
@@ -50,9 +54,9 @@ st.text("While confusion matrix is constructed with the following script")
 st.code("confusion_matrix(y_test, y_pred)")
 df_evaluation = pd.DataFrame(
     {
-        "precision": [1.00, 0.94, 0.96, 0.80, 1.00, 1.00, 1.00, None, 0.96, 0.97],
-        "recall": [0.67, 0.94, 0.96, 1.00, 0.95, 1.00, 1.00, None, 0.93, 0.96],
-        "f1-score": [0.80, 0.94, 0.96, 0.89, 0.98, 1.00, 1.00, 0.96, 0.94, 0.96],
+        "precision": [1.00, 0.94, 0.96, 0.85, 0.98, 1.00, 1.00, None, 0.96, 0.97],
+        "recall": [0.67, 0.94, 0.96, 0.92, 0.98, 1.00, 1.00, None, 0.92, 0.96],
+        "f1-score": [0.80, 0.94, 0.96, 0.88, 0.98, 1.00, 1.00, 0.96, 0.94, 0.96],
         "support": [3, 17, 27, 12, 42, 29, 11, 141, 141, 141],
     },
     index=["3", "4", "5", "6", "7", "8", "9", "accuracy", "macro avg", "weighted avg"]
